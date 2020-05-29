@@ -1,6 +1,5 @@
 package main
 
-import "C"
 import (
 	"context"
 	"fmt"
@@ -27,59 +26,6 @@ func run(dir string, bin string, args ...string) error {
 	cmd.Stderr = os.Stderr
 	cmd.Dir = dir
 	return cmd.Run()
-}
-
-type Secrets map[string]string
-
-type ClusterTemplateCloneRequest struct {
-	TemplateRepository string  `json:"templateRepository,omitempty"`
-	Secrets            Secrets `json:"secrets,omitempty"`
-	TargetOrg          string  `json:"targetOrg,omitempty"`
-	TargetRepo         string  `json:"targetRepo,omitempty"`
-	GitHubUser         string  `json:"gitHubUser,omitempty"`
-	GitHubToken        string  `json:"gitHubToken,omitempty"`
-}
-
-type ProfileApplyRequest struct {
-	TargetOrg   string   `json:"targetOrg,omitempty"`
-	TargetRepo  string   `json:"targetRepo,omitempty"`
-	GitHubUser  string   `json:"gitHubUser,omitempty"`
-	GitHubToken string   `json:"gitHubToken,omitempty"`
-	Profiles    []string `json:"profiles,omitempty"`
-}
-
-type ClusterStateApplyRequest struct {
-	TargetOrg    string `json:"targetOrg,omitempty"`
-	TargetRepo   string `json:"targetRepo,omitempty"`
-	GitHubUser   string `json:"gitHubUser,omitempty"`
-	GitHubToken  string `json:"gitHubToken,omitempty"`
-	ClusterState string `json:"clusterState,omitempty"`
-}
-
-type StatusRequest struct {
-	TargetOrg   string `json:"targetOrg,omitempty"`
-	TargetRepo  string `json:"targetRepo,omitempty"`
-	GitHubUser  string `json:"gitHubUser,omitempty"`
-	GitHubToken string `json:"gitHubToken,omitempty"`
-}
-
-type RunStatus struct {
-	Status     *string `json:"status,omitempty"`
-	Message    *string `json:"message,omitempty"`
-	Conclusion *string `json:"conclusion,omitempty"`
-}
-
-type ListClusterRequest struct {
-	GitHubUser  string `json:"gitHubUser,omitempty"`
-	GitHubToken string `json:"gitHubToken,omitempty"`
-}
-
-type ClusterStatus struct {
-	Name      string      `json:"name,omitempty"`
-	Status    string      `json:"status,omitempty"`
-	Conclusion string     `json:"conclusion,omitempty"`
-	Link      string      `json:"link,omitempty"`
-	RunStatus []RunStatus `json:"runStatus,omitempty"`
 }
 
 const GitOpsManagedCluster = "gitops-managed-cluster"
@@ -247,10 +193,6 @@ func replaceClusterName(templateDir string, clusterName string) error {
 	if err := run(templateDir, "git", "commit", "-am", fmt.Sprintf("set state to absent and change name to %s", clusterName)); err != nil {
 		return errors.Wrap(err, "Failed git commit")
 	}
-
-	// if err := run(templateDir, "git", "push", "origin", "master"); err != nil {
-	//	return errors.Wrap(err, "Push failed")
-	// }
 
 	return nil
 }
@@ -464,16 +406,7 @@ func listClusters(request *ListClusterRequest) ([]*ClusterStatus, error) {
 			0, 50,
 		},
 	})
-	/*
-		repos, _, err := client.Repositories.List(context.Background(), request.GitHubUser, &github.RepositoryListOptions{
-			Sort:        "pushed",
-			Direction:   "desc",
-			ListOptions: github.ListOptions{
-				Page:    0,
-				PerPage: 50,
-			},
-		})
-	*/
+
 	if err != nil {
 		return nil, err
 	}
