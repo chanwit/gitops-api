@@ -1,0 +1,19 @@
+apiVersion: gitops/v1alpha1
+kind: Cluster
+spec:
+  state: absent
+  timeout: 40m
+  template:
+    apiVersion: eksctl.io/v1alpha5
+    kind: ClusterConfig
+    metadata:
+      name: new_name2
+      region: us-west-2
+      version: 1.16
+    nodeGroups:
+    - name: ng-1
+      instanceType: m5.xlarge
+      desiredCapacity: 2
+      volumeSize: 120
+  profiles:
+  - a

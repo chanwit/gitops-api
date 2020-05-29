@@ -1,0 +1,10 @@
+{
+  "name": "gitops-api",
+  "private": true,
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "scripts": {
+    "build": "docker build -t chanwit/gitops-api:latest ."
+  }
+}
