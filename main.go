@@ -383,7 +383,7 @@ func main() {
 		clusterStatus, err := listClusters(req)
 		if err != nil {
 			c.JSON(400, gin.H{
-				"error": "Fail to list clusters and their status",
+				"error": fmt.Sprintf("Fail to list clusters and their status: %v", err),
 			})
 			return
 		}
@@ -426,6 +426,7 @@ func listClusters(request *ListClusterRequest) ([]*ClusterStatus, error) {
 		}
 	}
 
+	resultWithStatus := []*ClusterStatus{}
 	for _, c := range result {
 		parts := strings.SplitN(c.Name, "/", 2)
 		link, status, conclusion, runStatuses, err := GetWorkflowStatus(&StatusRequest{
@@ -435,13 +436,14 @@ func listClusters(request *ListClusterRequest) ([]*ClusterStatus, error) {
 			GitHubToken: request.GitHubToken,
 		})
 		if err != nil {
-			return nil, err
+			continue
 		}
 		c.Status = *status
 		c.Conclusion = *conclusion
 		c.RunStatus = runStatuses
 		c.Link = *link
+		resultWithStatus = append(resultWithStatus, c)
 	}
 
-	return result, err
+	return resultWithStatus, err
 }
